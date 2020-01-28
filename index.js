@@ -46,35 +46,39 @@ const add = function () {
     ).then(({ choice }) => {
         console.log([choice])
         if (choice === 'Role') {
-            connection.query('select * from department',(err,res)=>{
+            connection.query('select * from department', (err, res) => {
                 console.log(res)
-            inquirer
-                .prompt(
-                    [{
-                        type: 'input',
-                        name: 'name',
-                        message: 'Role Title?',
+                inquirer
+                    .prompt(
+                        [{
+                            type: 'input',
+                            name: 'name',
+                            message: 'Role Title?',
 
 
-                    },
-                    {
-                        type: 'input',
-                        name: 'Annual Salary?',
-                        message: 'Role Title?',
-                    },
-                    {
-                        type:'rawlist',
-                        name:'departmentId',
-                        message:'What department?',
-                        choices: function(){
-                            var choicesArr =[]
-                            for (each of res){
-                                choicesArr.push(each.name)
+                        },
+                        {
+                            type: 'input',
+                            name: 'salary',
+                            message: 'Annual Salary??',
+                        },
+                        {
+                            type: 'rawlist',
+                            name: 'department',
+                            message: 'What department?',
+                            choices: function () {
+                                var choicesArr = []
+                                for (each of res) {
+                                    choicesArr.push(each.name)
+                                }
+                                return choicesArr
                             }
-                            return choicesArr
-                        }
-                    }]
-                )}).then()
+                        }]
+                    ).then(({ name, salary, department }) => {
+                        console.log(name, salary, department)
+                    })
+
+            })
         }
         else if (choice === 'Employee') {
             console.log('yay Employee')
@@ -85,21 +89,6 @@ const add = function () {
         else {
             console.log('nope')
         }
-
-
-
-
-
-    }
-    )
+    })
 }
 add()
-
-
-
-
-
-
-
-
-
