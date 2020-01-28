@@ -1,4 +1,5 @@
 const inquirer = require('inquirer')
+const cTable = require('console.table')
 const mysql = require('mysql')
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -76,6 +77,30 @@ const add = function () {
                         }]
                     ).then(({ name, salary, department }) => {
                         console.log(name, salary, department)
+                        for (each of res) {
+                            if (each.name === department) {
+                                var departmentId = each.id
+                            }
+
+                        }
+                        connection.query('select id from role', (err, roleRes) => {
+                            var Id = roleRes.length + 1;
+                            console.log(Id)
+                            connection.query('insert into role set ?', {
+                                id: Id,
+                                title: name,
+                                salary: salary,
+                                department_id: departmentId
+                            },(err)=>{
+                                if (err) throw err;
+                                console.log('Made the new role in the database!')
+                            }
+                            )
+                        }
+                        )
+
+
+
                     })
 
             })
@@ -91,4 +116,24 @@ const add = function () {
         }
     })
 }
-add()
+const render = function(){
+    inquirer
+    .prompt(
+        {
+            type:'rawlist',
+            name :'choice',
+            message: 'What would you like to render?',
+            choices: ['Role','Employee','Department']
+        }
+    ).then(({choice})=>{
+        let choiceLower = choice.toLowerCase()
+        let query = `select * from ${choiceLower}`
+        connection.query(query,(err,res)=>{
+            // console.log(res)
+            console.table(res)
+        })
+        
+
+    })
+}
+render()
