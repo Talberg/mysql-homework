@@ -147,6 +147,8 @@ const add = function () {
                             role_id: roleId,
                             manager_id: manager
 
+                        },()=>{
+                            run()
                         })
                     }
 
@@ -174,7 +176,7 @@ const add = function () {
                             name: title
                         }, (err) => {
                             if (err) throw err;
-                            console.log('New Department created!')
+                           run()
                         })
                     })
 
@@ -198,8 +200,7 @@ const render = function () {
             let choiceLower = choice.toLowerCase()
             let query = `select * from ${choiceLower}`
             connection.query(query, (err, res) => {
-                // console.log(res)
-                console.table(res)
+               run()
             })
 
 
@@ -263,7 +264,7 @@ const run = function () {
                 type: 'rawlist',
                 name: 'choice',
                 message:'Welcome what would you like to do today?',
-                choices:['Add to database','Render database','Update employee role']
+                choices:['Add to database','Render database','Update employee role','EXIT']
             }
         ).then(({choice})=>{
             if(choice === 'Add to database' ){
@@ -275,10 +276,14 @@ const run = function () {
             if(choice === 'Update employee role' ){
                 update()
             }
+            else {
+                process.exit(5)
+            }
         })
 }
 
 // update()
 // render()
 // add()
+run()
 
