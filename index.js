@@ -47,7 +47,7 @@ const add = function () {
     ).then(({ choice }) => {
         if (choice === 'Role') {
             connection.query('select * from department', (err, res) => {
-                
+
                 inquirer
                     .prompt(
                         [{
@@ -90,7 +90,7 @@ const add = function () {
                                 title: name,
                                 salary: salary,
                                 department_id: departmentId
-                            },(err)=>{
+                            }, (err) => {
                                 if (err) throw err;
                                 console.log('Made the new role in the database!')
                             }
@@ -105,67 +105,79 @@ const add = function () {
             })
         }
         else if (choice === 'Employee') {
-            connection.query('select * from role', (err,res)=>{
+            connection.query('select * from role', (err, res) => {
                 inquirer
-                .prompt([{
-                    type:'input',
-                    name:'firstName',
-                    message: 'First Name please.'
+                    .prompt([{
+                        type: 'input',
+                        name: 'firstName',
+                        message: 'First Name please.'
 
-                },{
-                    type:'input',
-                    name:'lastName',
-                    message:'Last Name please'
-                },{
-                    type:'rawlist',
-                    name:'role',
-                    message:'What is the new employees role?',
-                    choices: function(){
-                        var choicesArr =[]
-                        for(each of res ){
-                            choicesArr.push(each.title)
-                            
+                    }, {
+                        type: 'input',
+                        name: 'lastName',
+                        message: 'Last Name please'
+                    }, {
+                        type: 'rawlist',
+                        name: 'role',
+                        message: 'What is the new employees role?',
+                        choices: function () {
+                            var choicesArr = []
+                            for (each of res) {
+                                choicesArr.push(each.title)
+
+                            }
+                            return choicesArr
                         }
-                        return choicesArr
-                    }
-                }]).then(({firstName,lastName,role})=>{
-                    for (each of res){
-                        if (each.title === role ){
-                            var roleId = each.id
+                    },
+                    {
+                        type: 'input',
+                        name: 'manager',
+                        message: "New employee's manager?",
+
+                    }]).then(({ firstName, lastName, role, manager }) => {
+                        for (each of res) {
+                            if (each.title === role) {
+                                var roleId = each.id
+                            }
+
                         }
+                        connection.query('insert into employee set?', {
+                            first_name: firstName,
+                            last_name: lastName,
+                            role_id: roleId,
+                            manager_id: manager
 
+                        })
                     }
-                    connection.query('')
-                }
 
-                )
+                    )
             })
 
 
-            
-            
+
+
         }
         else if (choice === 'Department') {
-            connection.query(`select * from department `,(err,res)=>{
-                    var id = res.length +11
-                    inquirer
+            connection.query(`select * from department `, (err, res) => {
+                var id = res.length + 11
+                inquirer
                     .prompt(
                         {
                             type: 'input',
-                            name : 'title',
-                            message:'Name of the new Department?',
-                            
+                            name: 'title',
+                            message: 'Name of the new Department?',
+
                         }
-                    ).then(({title})=>{
-                        connection.query(`insert  into department set ? `,{
+                    ).then(({ title }) => {
+                        connection.query(`insert  into department set ? `, {
                             id: id,
-                            name : title
-                        },(err)=>{
+                            name: title
+                        }, (err) => {
                             if (err) throw err;
                             console.log('New Department created!')
                         })
                     })
-                    
+
             })
         }
         else {
@@ -173,25 +185,100 @@ const add = function () {
         }
     })
 }
-const render = function(){
+const render = function () {
     inquirer
-    .prompt(
-        {
-            type:'rawlist',
-            name :'choice',
-            message: 'What would you like to render?',
-            choices: ['Role','Employee','Department']
-        }
-    ).then(({choice})=>{
-        let choiceLower = choice.toLowerCase()
-        let query = `select * from ${choiceLower}`
-        connection.query(query,(err,res)=>{
-            // console.log(res)
-            console.table(res)
-        })
-        
+        .prompt(
+            {
+                type: 'rawlist',
+                name: 'choice',
+                message: 'What would you like to render?',
+                choices: ['Role', 'Employee', 'Department']
+            }
+        ).then(({ choice }) => {
+            let choiceLower = choice.toLowerCase()
+            let query = `select * from ${choiceLower}`
+            connection.query(query, (err, res) => {
+                // console.log(res)
+                console.table(res)
+            })
 
+
+        })
+}
+const update = function () {
+    connection.query('select * from role', (errr, roleRes) => {
+        var roleArr = []
+        for (each of roleRes) {
+            roleArr.push(`${each.title} ${each.id}`)
+        }
+        connection.query('select * from employee', (err, res) => {
+
+            inquirer
+                .prompt([
+                    {
+                        type: 'rawlist',
+                        name: 'employee',
+                        message: 'Please choose an employee.',
+                        choices: function () {
+                            var choicesArr = []
+                            for (each of res) {
+                                choicesArr.push(`${each.first_name} ${each.last_name} ${each.id}`)
+
+                            }
+                            return choicesArr
+                        }
+                    },
+                    {
+                        type: 'rawlist',
+                        name: 'role',
+                        message: 'New role?',
+                        choices: roleArr
+
+                    },]
+                ).then(({ employee, role }) => {
+
+                    console.log(employee)
+                    var rolesplit = role.split(' ')
+                    var roleId = rolesplit[1]
+                    var splitEmp = employee.split(' ')
+                    var name = parseInt(splitEmp[2])
+                    console.log(name)
+
+                    connection.query(`update employee set role_id =? where id = ?`, [roleId, name], (error, results) => {
+                        if (error) throw error
+                        console.log(results)
+                        run()
+                    })
+
+
+
+                })
+        })
     })
 }
-add()
+const run = function () {
+    inquirer
+        .prompt(
+            {
+                type: 'rawlist',
+                name: 'choice',
+                message:'Welcome what would you like to do today?',
+                choices:['Add to database','Render database','Update employee role']
+            }
+        ).then(({choice})=>{
+            if(choice === 'Add to database' ){
+                add()
+            }
+            if(choice === 'Render database' ){
+                render()
+            }
+            if(choice === 'Update employee role' ){
+                update()
+            }
+        })
+}
+
+// update()
+// render()
+// add()
 
