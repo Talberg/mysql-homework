@@ -45,10 +45,9 @@ const add = function () {
             choices: ['Employee', 'Role', 'Department']
         }
     ).then(({ choice }) => {
-        console.log([choice])
         if (choice === 'Role') {
             connection.query('select * from department', (err, res) => {
-                console.log(res)
+                
                 inquirer
                     .prompt(
                         [{
@@ -106,10 +105,68 @@ const add = function () {
             })
         }
         else if (choice === 'Employee') {
-            console.log('yay Employee')
+            connection.query('select * from role', (err,res)=>{
+                inquirer
+                .prompt([{
+                    type:'input',
+                    name:'firstName',
+                    message: 'First Name please.'
+
+                },{
+                    type:'input',
+                    name:'lastName',
+                    message:'Last Name please'
+                },{
+                    type:'rawlist',
+                    name:'role',
+                    message:'What is the new employees role?',
+                    choices: function(){
+                        var choicesArr =[]
+                        for(each of res ){
+                            choicesArr.push(each.title)
+                            
+                        }
+                        return choicesArr
+                    }
+                }]).then(({firstName,lastName,role})=>{
+                    for (each of res){
+                        if (each.title === role ){
+                            var roleId = each.id
+                        }
+
+                    }
+                    connection.query('')
+                }
+
+                )
+            })
+
+
+            
+            
         }
         else if (choice === 'Department') {
-            console.log('yay Department')
+            connection.query(`select * from department `,(err,res)=>{
+                    var id = res.length +11
+                    inquirer
+                    .prompt(
+                        {
+                            type: 'input',
+                            name : 'title',
+                            message:'Name of the new Department?',
+                            
+                        }
+                    ).then(({title})=>{
+                        connection.query(`insert  into department set ? `,{
+                            id: id,
+                            name : title
+                        },(err)=>{
+                            if (err) throw err;
+                            console.log('New Department created!')
+                        })
+                    })
+                    
+            })
         }
         else {
             console.log('nope')
@@ -136,4 +193,5 @@ const render = function(){
 
     })
 }
-render()
+add()
+
