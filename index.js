@@ -1,10 +1,10 @@
 const inquirer = require('inquirer')
-const cTable = require('console.table')
+// const cTable = require('console.table')
 const mysql = require('mysql')
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: '',
+    password: 'Greblat2',
     port: 3306,
     database: 'employee_db'
 
@@ -97,6 +97,7 @@ const add = function () {
                             )
                         }
                         )
+                        run()
 
 
 
@@ -145,11 +146,10 @@ const add = function () {
                             first_name: firstName,
                             last_name: lastName,
                             role_id: roleId,
-                            manager_id: manager
 
-                        },()=>{
-                            run()
+
                         })
+                        run()
                     }
 
                     )
@@ -176,7 +176,8 @@ const add = function () {
                             name: title
                         }, (err) => {
                             if (err) throw err;
-                           run()
+                            console.log('New Department created!')
+                            run()
                         })
                     })
 
@@ -200,11 +201,16 @@ const render = function () {
             let choiceLower = choice.toLowerCase()
             let query = `select * from ${choiceLower}`
             connection.query(query, (err, res) => {
-               run()
-            })
+                // console.log(res)
+                console.table(res)
+                console.log('-------------------------------------------------------')
 
+            })
+            
+            
 
         })
+        run()
 }
 const update = function () {
     connection.query('select * from role', (errr, roleRes) => {
@@ -258,26 +264,24 @@ const update = function () {
     })
 }
 const run = function () {
+    console.log("________________________".repeat(30))
     inquirer
         .prompt(
             {
                 type: 'rawlist',
                 name: 'choice',
-                message:'Welcome what would you like to do today?',
-                choices:['Add to database','Render database','Update employee role','EXIT']
+                message: 'Welcome what would you like to do today?',
+                choices: ['Add to database', 'Render database', 'Update employee role']
             }
-        ).then(({choice})=>{
-            if(choice === 'Add to database' ){
+        ).then(({ choice }) => {
+            if (choice === 'Add to database') {
                 add()
             }
-            if(choice === 'Render database' ){
+            if (choice === 'Render database') {
                 render()
             }
-            if(choice === 'Update employee role' ){
+            if (choice === 'Update employee role') {
                 update()
-            }
-            else {
-                process.exit(5)
             }
         })
 }
@@ -286,4 +290,3 @@ const run = function () {
 // render()
 // add()
 run()
-
